@@ -1,0 +1,3 @@
+TACPLUS global auth_type login
+TACPLUS global passkey demo-rotated-key
+TACPLUS global timeout 5
