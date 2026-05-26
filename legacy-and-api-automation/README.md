@@ -11,6 +11,7 @@ The original folders contain useful ideas, but also raw customer exports, genera
 - CSV-to-Ansible-inventory rendering for onboarding batches.
 - Multi-vendor config pushes with Netmiko, guarded by dry-run defaults.
 - Interface status reporting with NAPALM.
+- Offline remediation logic for IOS local-user cleanup and SONiC TACACS config synchronization.
 
 ## Examples
 
@@ -60,6 +61,27 @@ export LAB_ANSIBLE_PASSWORD='replace-in-lab'
 python napalm_interface_report.py --hosts 192.0.2.31,192.0.2.32 --driver ios
 ```
 
+### Remediation Logic
+
+Generate IOS cleanup commands when a candidate config moves a user from `password` to `secret`:
+
+```bash
+cd legacy-and-api-automation/remediation
+python ios_local_user_cleanup.py \
+	--candidate sample_candidate_users.cfg \
+	--running sample_running_users.cfg \
+	--output artifacts/ios_user_cleanup.txt
+```
+
+Synchronize a SONiC `tacacs.json` passkey from sanitized `show tacacs` output:
+
+```bash
+python sonic_tacacs_sync.py \
+	--show-tacacs sample_show_tacacs.txt \
+	--json sample_tacacs.json \
+	--output artifacts/tacacs_updated.json
+```
+
 ## Sanitization Notes
 
 - No original Meraki CSV exports are included.
@@ -67,3 +89,4 @@ python napalm_interface_report.py --hosts 192.0.2.31,192.0.2.32 --driver ios
 - No legacy Telnet credential stores are included.
 - No raw customer config files, videos, logs, or vendored third-party source trees are included.
 - All example IPs use documentation ranges.
+- Remediation examples operate on local sample files by default and do not connect to devices.
