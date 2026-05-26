@@ -9,7 +9,7 @@ The source material came from retired lab and automation folders. This public ve
 | Section | Focus | Highlights |
 | --- | --- | --- |
 | `cisco-ansible-campus` | Cisco IOS campus lab automation | Show-command collection, config backup, access-switch baseline, security hardening |
-| `network-discovery` | Multi-vendor Ansible discovery and SNMP baseline | Structured CDP/LLDP/ARP parsing, topology edge generation, SNMPv3 IOS/NX-OS examples |
+| `network-discovery` | Multi-vendor Ansible discovery and SNMP baseline | Structured CDP/LLDP/ARP parsing, topology edge generation, ARP vendor enrichment, SNMPv3 IOS/NX-OS examples |
 | `legacy-and-api-automation` | API, legacy firewall, Netmiko, and NAPALM examples | Meraki reporting, ScreenOS SSH automation, CSV inventory rendering, multi-vendor CLI pushes, interface reporting |
 | `fortigate-automation` | FortiGate and FortiManager automation | CSV object generation, config export parsing, BGP/IPsec health parsing, FortiManager/ZTP patterns |
 | `juniper-automation/pyez` | Junos Python automation | Facts, RPCs, XPath, BGP validation, SCP, rescue config, shell access, config diff/rollback, commit confirmed, reboot/software guardrails |
@@ -60,6 +60,7 @@ cd network-discovery
 ansible-playbook playbooks/collect_lldp_structured.yml
 ansible-playbook playbooks/configure_snmpv3_ios.yml --check
 python parsers/build_topology_edges.py artifacts/lldp --output artifacts/topology_edges.csv
+python parsers/enrich_arp_vendors.py sample_arp.csv --output artifacts/arp_enriched.csv --offline
 ```
 
 Legacy and API automation examples:
