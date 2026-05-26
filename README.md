@@ -9,7 +9,7 @@ The source material came from retired lab and automation folders. This public ve
 | Section | Focus | Highlights |
 | --- | --- | --- |
 | `cisco-ansible-campus` | Cisco IOS campus lab automation | Show-command collection, config backup, access-switch baseline, security hardening |
-| `juniper-automation/pyez` | Junos Python automation | BGP validation, facts, config diff/rollback, commit confirmed, reboot/software guardrails |
+| `juniper-automation/pyez` | Junos Python automation | Facts, RPCs, XPath, BGP validation, SCP, rescue config, shell access, config diff/rollback, commit confirmed, reboot/software guardrails |
 | `juniper-automation/ansible` | Junos Ansible and Jinja | Facts, command execution, ISIS config rendering, optional commit-confirm deployment |
 
 ## Portfolio Story
@@ -60,6 +60,7 @@ Juniper PyEZ examples:
 ```bash
 cd juniper-automation/pyez
 python show_version.py --host 198.51.100.11
+python rpc_queries.py --host 198.51.100.11 interfaces --xpath './/physical-interface/name'
 python config_workflow.py --host 198.51.100.11 --config ../ansible/artifacts/isis/core-a_isis_interfaces.conf
 ```
 
