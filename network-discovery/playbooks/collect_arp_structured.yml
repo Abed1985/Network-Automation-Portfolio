@@ -1,0 +1,24 @@
+---
+- name: Collect ARP tables as structured data
+  hosts: discovery_targets
+  gather_facts: false
+
+  tasks:
+    - name: Select ARP command per platform group
+      ansible.builtin.set_fact:
+        arp_command: >-
+          {{ 'display arp' if 'huawei_vrp_targets' in group_names else 'show ip arp' }}
+
+    - name: Run ARP command through TextFSM parser
+      ansible.utils.cli_parse:
+        command: "{{ arp_command }}"
+        parser:
+          name: ansible.netcommon.ntc_templates
+      register: arp_table
+
+    - name: Save ARP JSON per device
+      ansible.builtin.copy:
+        content: "{{ arp_table.parsed | to_nice_json }}"
+        dest: "artifacts/arp/{{ inventory_hostname }}.json"
+        mode: "0644"
+      delegate_to: localhost
