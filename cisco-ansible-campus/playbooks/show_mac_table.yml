@@ -1,0 +1,15 @@
+---
+- name: Collect Cisco IOS MAC address tables
+  hosts: campus_access
+  gather_facts: false
+
+  tasks:
+    - name: Run show mac address-table
+      cisco.ios.ios_command:
+        commands:
+          - show mac address-table
+      register: mac_table
+
+    - name: Print MAC address table for quick lab inspection
+      ansible.builtin.debug:
+        var: mac_table.stdout_lines
