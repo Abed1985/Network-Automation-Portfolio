@@ -1,0 +1,11 @@
+{% for interface in isis_interfaces[inventory_hostname].interfaces %}
+set protocols isis interface {{ interface.interface }}.0 point-to-point
+set protocols isis interface {{ interface.interface }}.0 {{ isis_defaults.level }} metric {{ isis_defaults.metric }}
+set interfaces {{ interface.interface }} unit 0 family iso
+{% if interface.inet is defined %}
+set interfaces {{ interface.interface }} unit 0 family inet address {{ interface.inet }}
+{% endif %}
+{% if interface.iso is defined %}
+set interfaces {{ interface.interface }} unit 0 family iso address {{ interface.iso }}
+{% endif %}
+{% endfor %}
