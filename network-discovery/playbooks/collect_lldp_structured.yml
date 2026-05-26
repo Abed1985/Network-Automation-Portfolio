@@ -1,0 +1,30 @@
+---
+- name: Collect LLDP neighbors as structured data
+  hosts: discovery_targets
+  gather_facts: false
+  vars_files:
+    - ../inventory/group_vars.yml
+
+  tasks:
+    - name: Select LLDP command per platform group
+      ansible.builtin.set_fact:
+        lldp_command: >-
+          {{ 'display lldp neighbor brief' if 'huawei_vrp_targets' in group_names else 'show lldp neighbors' }}
+
+    - name: Run LLDP command through TextFSM parser
+      ansible.utils.cli_parse:
+        command: "{{ lldp_command }}"
+        parser:
+          name: ansible.netcommon.ntc_templates
+      register: lldp_neighbors
+
+    - name: Save LLDP neighbor JSON per device
+      ansible.builtin.copy:
+        content: "{{ lldp_neighbors.parsed | to_nice_json }}"
+        dest: "artifacts/lldp/{{ inventory_hostname }}.json"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Show concise neighbor summary
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }} has {{ lldp_neighbors.parsed | length }} LLDP neighbors"
