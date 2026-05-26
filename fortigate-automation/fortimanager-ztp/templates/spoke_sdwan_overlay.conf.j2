@@ -1,0 +1,22 @@
+config system sdwan
+    set status enable
+    config members
+{% for member in sdwan_members %}
+        edit {{ loop.index }}
+            set interface "{{ member.interface }}"
+            set gateway {{ member.gateway }}
+        next
+{% endfor %}
+    end
+end
+config router bgp
+    set as {{ local_asn }}
+    config neighbor
+{% for neighbor in bgp_neighbors %}
+        edit "{{ neighbor.ip }}"
+            set remote-as {{ neighbor.remote_asn }}
+            set update-source "{{ neighbor.update_source }}"
+        next
+{% endfor %}
+    end
+end
