@@ -1,0 +1,15 @@
+---
+- name: Demonstrate FortiManager ADOM workspace lock pattern
+  hosts: fortimanager
+  gather_facts: false
+
+  tasks:
+    - name: Lock customer ADOM workspace
+      fortinet.fortimanager.fmgr_dvmdb_workspace_lock:
+        adom: "{{ customer_adom }}"
+      register: workspace_lock
+      no_log: true
+
+    - name: Show sanitized lock status
+      ansible.builtin.debug:
+        msg: "Workspace lock request completed for {{ customer_adom }}"
