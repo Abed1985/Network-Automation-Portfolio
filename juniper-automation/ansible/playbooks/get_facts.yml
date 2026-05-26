@@ -1,0 +1,16 @@
+---
+- name: Collect Junos facts
+  hosts: junos_lab
+  gather_facts: false
+
+  tasks:
+    - name: Get Junos facts over NETCONF
+      junipernetworks.junos.junos_facts:
+      register: junos_facts
+
+    - name: Print concise device facts
+      ansible.builtin.debug:
+        msg:
+          hostname: "{{ ansible_net_hostname | default(inventory_hostname) }}"
+          model: "{{ ansible_net_model | default('unknown') }}"
+          version: "{{ ansible_net_version | default('unknown') }}"
