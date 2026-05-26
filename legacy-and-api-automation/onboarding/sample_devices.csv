@@ -1,0 +1,5 @@
+name,host,platform,group
+branch-fw-1,192.0.2.61,screenos,legacy_firewalls
+branch-ios-1,192.0.2.31,cisco_ios,branch_routers
+branch-nxos-1,198.51.100.31,cisco_nxos,data_center
+junos-edge-1,198.51.100.51,juniper_junos,edge
