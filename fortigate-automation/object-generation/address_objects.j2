@@ -1,0 +1,8 @@
+{% for row in addresses %}
+config firewall address
+    edit "{{ row.name }}"
+        set subnet {{ row.subnet | replace('/32', ' 255.255.255.255') | replace('/24', ' 255.255.255.0') }}
+        set comment "{{ row.comment }}"
+    next
+end
+{% endfor %}
