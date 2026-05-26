@@ -1,0 +1,25 @@
+---
+- name: Configure SNMPv3 baseline on Cisco NX-OS devices
+  hosts: cisco_nxos_targets
+  gather_facts: false
+  vars_files:
+    - ../inventory/group_vars.yml
+
+  tasks:
+    - name: Configure SNMP ACL entries
+      cisco.nxos.nxos_config:
+        lines: "permit ip {{ item }}/32 any"
+        parents: "ip access-list {{ snmp_acl_name }}"
+      loop: "{{ snmp_allowed_hosts }}"
+
+    - name: Configure SNMPv3 group and user
+      cisco.nxos.nxos_config:
+        lines:
+          - "snmp-server group {{ snmp_v3_group }} network-operator"
+          - "snmp-server user {{ snmp_v3_user }} {{ snmp_v3_group }} auth sha {{ snmp_v3_auth }} priv aes-128 {{ snmp_v3_priv }}"
+          - "snmp-server user {{ snmp_v3_user }} use-ipv4acl {{ snmp_acl_name }}"
+      no_log: true
+
+    - name: Save configuration when changed
+      cisco.nxos.nxos_config:
+        save_when: modified
