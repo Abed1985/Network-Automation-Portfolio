@@ -1,0 +1,70 @@
+---
+- name: Apply Cisco campus access baseline
+  hosts: campus_access
+  gather_facts: false
+  vars_files:
+    - ../inventory/group_vars.yml
+
+  tasks:
+    - name: Configure global access switch services
+      cisco.ios.ios_config:
+        lines:
+          - vtp mode transparent
+          - spanning-tree mode rapid-pvst
+          - udld enable
+          - errdisable recovery cause all
+          - port-channel load-balance src-dst-ip
+          - no ip http server
+          - ip http secure-server
+          - ntp update-calendar
+          - service timestamps debug datetime msec localtime
+          - service timestamps log datetime msec localtime
+          - no ip dhcp snooping information option
+          - ip dhcp snooping
+          - spanning-tree portfast bpduguard default
+
+    - name: Configure DNS servers from sanitized lab variables
+      cisco.ios.ios_config:
+        lines:
+          - "ip name-server {{ item }}"
+      loop: "{{ campus_dns_servers }}"
+
+    - name: Configure NTP servers from sanitized lab variables
+      cisco.ios.ios_config:
+        lines:
+          - "ntp server {{ item }}"
+      loop: "{{ campus_ntp_servers }}"
+
+    - name: Create campus VLANs
+      cisco.ios.ios_vlans:
+        config:
+          - vlan_id: "{{ item }}"
+            state: active
+        state: merged
+      loop: "{{ campus_vlans }}"
+
+    - name: Configure IPv6 RA guard host policy
+      cisco.ios.ios_config:
+        parents: ipv6 nd raguard policy HOST_POLICY
+        lines:
+          - device-role host
+
+    - name: Configure standard access ports
+      cisco.ios.ios_config:
+        parents: "interface {{ item.interface }}"
+        lines:
+          - "switchport access vlan {{ item.vlan }}"
+          - "switchport voice vlan {{ item.voice_vlan }}"
+          - switchport host
+          - switchport port-security maximum 2
+          - switchport port-security
+          - switchport port-security aging time 2
+          - switchport port-security aging type inactivity
+          - switchport port-security violation restrict
+          - ip arp inspection limit rate 100
+          - ip dhcp snooping limit rate 100
+          - ip verify source
+          - ipv6 nd raguard attach-policy HOST_POLICY
+        after:
+          - no shutdown
+      loop: "{{ access_ports }}"
